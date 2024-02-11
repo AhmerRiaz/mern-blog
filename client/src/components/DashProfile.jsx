@@ -51,6 +51,7 @@ useEffect(() => {
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setImageFileUploadProgress(progress.toFixed(0));
+      
       }, 
       (error) => {
         setImageFileUploadError('Error uploading image (File must be less than 2MB)');
