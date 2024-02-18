@@ -45,7 +45,7 @@ export const signUp = async (req, res, next) => {
        if(!validPassword) {
            return next(errorHandler(400, 'Invalid credentials'));
        }
-       const token = jwt.sign({ _id: validUser._id }, process.env.JWT_SECRET);
+       const token = jwt.sign({ _id: validUser._id, isAdmin: validUser.isAdmin }, process.env.JWT_SECRET);
 
        const {password: pass, ...rest} = validUser._doc
 
@@ -66,7 +66,7 @@ export const signUp = async (req, res, next) => {
        try {
         const validUser = await User.findOne({ email });
         if(validUser) {
-            const token = jwt.sign({_id: validUser._id}, process.env.JWT_SECRET);
+            const token = jwt.sign({_id: validUser._id, isAdmin: validUser.isAdmin}, process.env.JWT_SECRET);
             const {password, ...rest} = validUser._doc
             res.status(200).cookie('access_token', token, {
                 httpOnly: true
@@ -82,8 +82,8 @@ export const signUp = async (req, res, next) => {
                 password: hashedPassword,
                 profilePicture:googlePhotoURL,
             });
-            const savedUser = await newUser.save();
-            const token = jwt.sign({_id: savedUser._id}, process.env.JWT_SECRET);
+            await newUser.save();
+            const token = jwt.sign({_id: newUser._id, isAdmin: newUser.isAdmin}, process.env.JWT_SECRET);
             const {password, ...rest} = savedUser._doc
             res.status(200).cookie('access_token', token, {
                 httpOnly: true
