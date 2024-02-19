@@ -3,7 +3,7 @@ import Post from "../model/post.model.js";
 
 
 export const createPost = async (req, res, next) => {
-    console.log(req.user);
+    
   if (!req.user.isAdmin) {
     return next(errorHandler(403, "You are not allowed to create a post"));
   }
