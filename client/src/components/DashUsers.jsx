@@ -4,6 +4,7 @@ import { Table, Button } from 'flowbite-react'
 import { Link } from 'react-router-dom'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
 import { Modal } from 'flowbite-react'
+import { FaCheck, FaTimes } from 'react-icons/fa'
 
 export default function DashPost() {
   const {currentUser} = useSelector((state) => state.user)
@@ -67,6 +68,10 @@ export default function DashPost() {
    } 
   }*/
 
+  const handleDeleteUser = async (userId) => {
+    
+  }
+
   return (
     <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300
     dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
@@ -79,9 +84,7 @@ export default function DashPost() {
             <Table.HeadCell>UserName</Table.HeadCell>
             <Table.HeadCell>Email</Table.HeadCell>
             <Table.HeadCell>Delete</Table.HeadCell>
-            <Table.HeadCell>
-              <span>Edit</span>
-              </Table.HeadCell>
+           
             </Table.Head>
             {users.map((user) => (
               <Table.Body key={user._id} className='divide-y'>
@@ -92,26 +95,21 @@ export default function DashPost() {
                         <img 
                         src={user.profilePicture} 
                         alt={user.username}
-                        className='w-20 h-10 object-cover bg-gray-500' />
+                        className='w-10 h-10 object-cover bg-gray-500 rounded-full' />
                       
                   </Table.Cell>
                   <Table.Cell>{user.username}</Table.Cell>
                   <Table.Cell>{user.email}</Table.Cell>
+                  <Table.Cell>{user.isAdmin ? (<FaCheck className='text-green-500'/>) : (<FaTimes className='text-red-500'/>)}</Table.Cell>
                   <Table.Cell>
                     <span onClick={() => {
                        setShowModal(true)
-                       setPostIdToDelete(post._id)
+                       setPostIdToDelete(user._id)
                        }} className='text-red-500 font-medium hover:underline cursor-pointer'>
                       Delete
                     </span>
                   </Table.Cell>
-                  <Table.Cell>
-                    <Link to="" className='text-teal-500 hover:underline cursor-pointer'>
-                      <span>
-                        Edit
-                      </span>
-                    </Link>
-                  </Table.Cell>
+              
                   </Table.Row>
                 </Table.Body>
             ))}
@@ -123,7 +121,7 @@ export default function DashPost() {
         }
         </>
       ): (
-        <p>You have no posts</p>
+        <p>You have no users</p>
       )}
       <Modal show={showModal} 
       onClose={() => setShowModal(false)}
@@ -134,9 +132,9 @@ export default function DashPost() {
         <Modal.Body>
           <div className="text-center">
             <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto"/>
-            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure you want to delete this post?</h3>
+            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure you want to delete this user?</h3>
             <div className="flex justify-center gap-4">
-              <Button color='failure' >Yes, I'm</Button>
+              <Button color='failure' onClick={handleDeleteUser}>Yes, I'm</Button>
               <Button color='gray' onClick={() => setShowModal(false)} >No, Cancel</Button>
             </div>
           </div>
