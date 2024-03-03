@@ -11,7 +11,7 @@ export default function DashPost() {
   const [users, setUsers] = useState([])
   const [showMore, setShowMore] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [postIdToDelete, setPostIdToDelete] = useState('')
+  const [userIdToDelete, setUserIdToDelete] = useState('')
   console.log(users);
   useEffect(() => {
     const fetchUsers = async () => {
@@ -68,8 +68,22 @@ export default function DashPost() {
    } 
   }*/
 
-  const handleDeleteUser = async (userId) => {
-    
+  const HandleDeleteUser = async () => {
+    try {
+      
+      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json();
+      if(res.ok) {
+        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+        setShowModal(false);
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   return (
@@ -104,7 +118,7 @@ export default function DashPost() {
                   <Table.Cell>
                     <span onClick={() => {
                        setShowModal(true)
-                       setPostIdToDelete(user._id)
+                       setUserIdToDelete(user._id)
                        }} className='text-red-500 font-medium hover:underline cursor-pointer'>
                       Delete
                     </span>
@@ -134,7 +148,7 @@ export default function DashPost() {
             <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto"/>
             <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">Are you sure you want to delete this user?</h3>
             <div className="flex justify-center gap-4">
-              <Button color='failure' onClick={handleDeleteUser}>Yes, I'm</Button>
+              <Button color='failure' onClick={HandleDeleteUser}>Yes, I'm</Button>
               <Button color='gray' onClick={() => setShowModal(false)} >No, Cancel</Button>
             </div>
           </div>
