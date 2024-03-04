@@ -18,11 +18,17 @@ export default function UpdatePost() {
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    title: '',
+    category: 'uncategorized',
+    content: '',
+  });
   const [publishError, setPublishError] = useState(null);
   const navigate = useNavigate();
   const { postId } = useParams();
   const {currentUser} = useSelector(state => state.user);
+  console.log('formData ID', formData._id);
+  console.log(formData);
 
   useEffect(() => {
       try {
@@ -46,7 +52,6 @@ export default function UpdatePost() {
       }
   }, [postId])
 
-  console.log(formData);
 
   const handleImageUpload = async (e) => {
     try {
@@ -86,7 +91,7 @@ export default function UpdatePost() {
 
   const handleSubmit = async (e) => {
       e.preventDefault();
-      
+      console.log('formData ID', formData._id, 'currentUser ID', currentUser._id);
       try {
         const res = await fetch(`/api/post/updatepost/${formData._id}/${currentUser._id}`, {
           method: 'PUT',
