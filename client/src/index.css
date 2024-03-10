@@ -32,3 +32,11 @@ body {
     color: rgb(73, 149, 199);
     text-decoration: none;
 }
+
+.post-content a:hover {
+    text-decoration: underline;
+}
+
+.dark .post-content a {
+    color: rgb(73, 149, 199)
+}
