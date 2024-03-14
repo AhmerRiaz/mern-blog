@@ -1,62 +1,94 @@
 import { TextInput, Textarea, Button, Alert } from "flowbite-react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import Comment from './Comment';
+import { Link, useNavigate } from "react-router-dom";
+import Comment from "./Comment";
 import { useEffect, useState } from "react";
-
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [commentError, setCommentError] = useState(null);
   const [comments, setComments] = useState([]);
+  const navigate = useNavigate();
   console.log(comments);
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const res = await fetch(`/api/comment/getPostComments/${postId}`);
-        if(res.ok){
+        if (res.ok) {
           const data = await res.json();
           setComments(data);
         }
       } catch (error) {
         console.log(error.message);
       }
-    }
+    };
 
-    fetchComments()
-    
-  }, [postId])
+    fetchComments();
+  }, [postId]);
 
   const HandleSubmit = async (e) => {
-    e.preventDefault()
-    if(comment.length > 200) {
-      return
+    e.preventDefault();
+    if (comment.length > 200) {
+      return;
     }
-
 
     try {
-      const res = await fetch('/api/comment/create', {
-        method: 'POST',
+      const res = await fetch("/api/comment/create", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: comment, postId, userId: currentUser._id }),
-      })
-      const data = await res.json()
-      if(res.ok) {
-        setComment('')
-        setCommentError(null)
-        setComments([data, ...comments])
+        body: JSON.stringify({
+          content: comment,
+          postId,
+          userId: currentUser._id,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setComment("");
+        setCommentError(null);
+        setComments([data, ...comments]);
       }
-      
     } catch (error) {
-      setCommentError(error.message)
+      setCommentError(error.message);
     }
-    
+  };
 
+  const handleLike = async (commentId) => {
+    try {
+      if(!currentUser){
+        navigate('/signin')
+        return
+      }
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, 
+      {
+        method: 'PUT',
+      })
+      if(res.ok) {
+        
+        const data = await res.json();
+          // Filter out null value if it exists
+          const filteredLikes = data.likes.filter(like => like !== null);
+        
+        setComments(
+          comments.map((comment) => 
+            
+          comment._id === commentId ? {
+            ...comment,
+              likes: filteredLikes,
+              numberOfLikes: filteredLikes.length,
+          } : comment
+        ))
+        console.log(comments)
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   }
+
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
@@ -83,47 +115,49 @@ export default function CommentSection({ postId }) {
           </Link>
         </div>
       )}
-      {
-        currentUser && (
-          <form onSubmit={HandleSubmit} className="border border-teal-500 rounded-md p-3 ">
-            <Textarea
+      {currentUser && (
+        <form
+          onSubmit={HandleSubmit}
+          className="border border-teal-500 rounded-md p-3 "
+        >
+          <Textarea
             placeholder="Add a comment..."
             rows={3}
             maxLength={200}
             onChange={(e) => setComment(e.target.value)}
             value={comment}
-            />
-            <div className="flex justify-between items-center mt-5">
-              <p className="text-gray-500 text-xs ">{200 - comment.length} characters remaining</p>
-              <Button outline gradientDuoTone="purpleToBlue" type="submit">Submit</Button>
-            </div>
-            {commentError && <Alert color="failure" className="mt-5">{commentError} </Alert>}
-          </form>
+          />
+          <div className="flex justify-between items-center mt-5">
+            <p className="text-gray-500 text-xs ">
+              {200 - comment.length} characters remaining
+            </p>
+            <Button outline gradientDuoTone="purpleToBlue" type="submit">
+              Submit
+            </Button>
+          </div>
+          {commentError && (
+            <Alert color="failure" className="mt-5">
+              {commentError}{" "}
+            </Alert>
           )}
-          {comments.length === 0 ? (
-            <p className="text-sm my-5">No Comments yet</p>
-          )
-        : (
-          <>          <div className="text-sm my-5 flex items-center gap-1">
+        </form>
+      )}
+      {comments.length === 0 ? (
+        <p className="text-sm my-5">No Comments yet</p>
+      ) : (
+        <>
+          {" "}
+          <div className="text-sm my-5 flex items-center gap-1">
             <p>Comments</p>
             <div className="border border-gray-400 py-1 px-2 rounded-sm">
               <p>{comments.length}</p>
             </div>
           </div>
           {comments.map((comment) => {
-            return (
-              <Comment
-            key={comment._id}
-            comment={comment}
-            />
-            )
-            
+            return <Comment key={comment._id} comment={comment} onLike={handleLike} />;
           })}
-          </>
-
-        )
-        
-        }
+        </>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Comment from "../model/comment.model.js";
+import { errorHandler } from "../utils/error.js";
 
 export const createComment = async (req, res, next) => {
     try {
@@ -27,5 +28,31 @@ export const getPostComments = async (req, res, next) => {
         
     } catch (error) {
         next(error);
+    }
+}
+
+
+export const likeComment = async (req, res, next) => {
+    console.log(req.user._id)
+    try {
+        const comment = await Comment.findById(req.params.commentId);
+        if(!comment) {
+            return next(errorHandler(404, 'Comment Not found'))
+        }
+
+        const userIndex = comment.likes.indexOf(req.user._id)
+        if(userIndex === -1) {
+            comment.numberOfLikes += 1
+            comment.likes.push(req.user._id)
+        } else {
+            comment.numberOfLikes -= 1
+            comment.likes.splice(userIndex, 1);
+        }
+
+        await comment.save();
+        res.status(200).json(comment)
+
+    } catch (error) {
+        next(error)
     }
 }
