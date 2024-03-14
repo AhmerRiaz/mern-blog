@@ -5,6 +5,7 @@ import { verifyToken } from '../utils/verifyUser.js';
 import { deleteUser } from '../controllers/user.controller.js';
 import { userSignOut } from '../controllers/user.controller.js';
 import { getuser } from '../controllers/user.controller.js';
+import { getsUser } from '../controllers/user.controller.js';
 
 const router = express.Router();
 
@@ -13,4 +14,5 @@ router.put('/update/:userId', verifyToken , userUpdate);
 router.delete('/delete/:userId', verifyToken , deleteUser);
 router.post('/signout', userSignOut)
 router.get('/getusers', verifyToken, getuser);
+router.get('/:userId', getsUser)
 export default router;

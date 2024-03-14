@@ -1,13 +1,33 @@
 import { TextInput, Textarea, Button, Alert } from "flowbite-react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import Comment from './Comment';
+import { useEffect, useState } from "react";
+
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [commentError, setCommentError] = useState(null);
-  console.log(comment);
+  const [comments, setComments] = useState([]);
+  console.log(comments);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/comment/getPostComments/${postId}`);
+        if(res.ok){
+          const data = await res.json();
+          setComments(data);
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    fetchComments()
+    
+  }, [postId])
 
   const HandleSubmit = async (e) => {
     e.preventDefault()
@@ -28,6 +48,7 @@ export default function CommentSection({ postId }) {
       if(res.ok) {
         setComment('')
         setCommentError(null)
+        setComments([data, ...comments])
       }
       
     } catch (error) {
@@ -78,9 +99,31 @@ export default function CommentSection({ postId }) {
             </div>
             {commentError && <Alert color="failure" className="mt-5">{commentError} </Alert>}
           </form>
-          
+          )}
+          {comments.length === 0 ? (
+            <p className="text-sm my-5">No Comments yet</p>
+          )
+        : (
+          <>          <div className="text-sm my-5 flex items-center gap-1">
+            <p>Comments</p>
+            <div className="border border-gray-400 py-1 px-2 rounded-sm">
+              <p>{comments.length}</p>
+            </div>
+          </div>
+          {comments.map((comment) => {
+            return (
+              <Comment
+            key={comment._id}
+            comment={comment}
+            />
+            )
+            
+          })}
+          </>
+
         )
-      }
+        
+        }
     </div>
   );
 }
