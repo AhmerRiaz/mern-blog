@@ -6,7 +6,7 @@ import { get } from "mongoose";
 import { useSelector } from "react-redux";
 import { Textarea, Button, Alert } from "flowbite-react";
 
-export default function Comment({ comment, onLike, onEdit }) {
+export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const { currentUser } = useSelector((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent ] = useState(comment.content);
@@ -51,6 +51,7 @@ export default function Comment({ comment, onLike, onEdit }) {
         console.log(error.message);
     }
   } 
+
 
 
 
@@ -125,6 +126,7 @@ export default function Comment({ comment, onLike, onEdit }) {
               </p>
               {currentUser &&
                 (currentUser._id === comment.userId || currentUser.isAdmin) && (
+                  <>
                   <button
                     type="button"
                     className="text-gray-400 hover:text-blue-500"
@@ -132,6 +134,15 @@ export default function Comment({ comment, onLike, onEdit }) {
                   >
                     Edit
                   </button>
+
+                  <button
+                  type="button"
+                  className="text-gray-400 hover:text-red-500"
+                  onClick={() => onDelete(comment._id)}
+                >
+                  Delete
+                </button>
+                </>
                 )}
             </div>
           </>
